@@ -119,10 +119,10 @@
         const warnings = [];
 
         const rowRegex =
-          /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)\s*(?<unit>[A-Za-z]{1,6})?\s+(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s+(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
+          /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)(?:\s+(?<unit>[A-Za-z]{1,6}))?\s+(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s+(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
 
         lines.forEach((line, idx) => {
-          if (/invoice|total|subtotal|tax|amount due/i.test(line)) {
+          if (/^\s*(subtotal|total|tax|amount due)\b/i.test(line)) {
             return;
           }
 
@@ -358,7 +358,6 @@
 
           const resultPayload = {
             source: {
-              used_ocr_api: Boolean((secret || "").trim()),
               destination_country: destinationCountry,
               pages_detected: ocr.pages,
               ocr_confidence: ocr.confidence,
