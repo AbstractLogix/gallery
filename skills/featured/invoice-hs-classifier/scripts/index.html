@@ -217,6 +217,7 @@
               line_total: parseMoney(rowMatch.groups.lineTotal) || "",
               unit_price_raw: rowMatch.groups.unitPrice || "",
               line_total_raw: rowMatch.groups.lineTotal || "",
+              declared_value_raw: "",
               material: detectMaterial(description),
               country_of_origin: detectOrigin(line),
               extraction_flags: [],
@@ -240,6 +241,7 @@
               line_total: "",
               unit_price_raw: "",
               line_total_raw: "",
+              declared_value_raw: "",
               material: detectMaterial(line),
               country_of_origin: detectOrigin(line),
               extraction_flags: ["unstructured_row"],
@@ -285,7 +287,7 @@
           if (description) {
             const normalizedHarmonized = normalizeHarmonizedNumber(harmonizedRaw);
             const item = {
-              index: 1,
+              index: itemRows.length + 1,
               source_line: 0,
               raw_line: "",
               description,
@@ -421,7 +423,7 @@
             warnings.push("OCR completed but returned empty text.");
           }
           if (
-            /(?:page|sheet)\s*\d+\s*(?:of|\/)\s*(?:[2-9]\d*|\d{2,})|\b\d+\s*\/\s*(?:[2-9]\d*|\d{2,})\b/i.test(
+            /(?:page|sheet)\s*\d+\s*(?:of|\/)\s*(?:[2-9]\d*|\d{2,})|(?:^|\n)\s*[1-9]\d?\s*\/\s*(?:[2-9]\d*|\d{2,})\s*(?:$|\n)/i.test(
               textParts,
             )
           ) {
