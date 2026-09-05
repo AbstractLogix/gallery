@@ -34,7 +34,6 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.io.InputStreamReader
-import java.net.URI
 import java.net.URL
 import java.security.MessageDigest
 import javax.inject.Inject
@@ -203,8 +202,14 @@ constructor(
     return withContext(Dispatchers.IO) {
       Log.d(TAG, "Validating skill from URL: $url")
 
-      // 1. Normalize the URL to the skill base path.
-      val normalizedUrl = normalizeSkillBaseUrl(url)
+      // 1. Normalize the URL: remove trailing "/SKILL.md" or "/".
+      var normalizedUrl = url
+      if (normalizedUrl.endsWith("/SKILL.md")) {
+        normalizedUrl = normalizedUrl.dropLast("/SKILL.md".length)
+      }
+      if (normalizedUrl.endsWith("/")) {
+        normalizedUrl = normalizedUrl.dropLast(1)
+      }
       val skillMdUrl = "$normalizedUrl/SKILL.md"
       Log.d(TAG, "Fetching SKILL.md from: $skillMdUrl")
 
@@ -957,56 +962,6 @@ constructor(
   }
 
   companion object {
-    private fun normalizeSkillBaseUrl(url: String): String {
-      var normalizedUrl = url.trim().substringBefore('#').substringBefore('?')
-      if (normalizedUrl.endsWith("/SKILL.md")) {
-        normalizedUrl = normalizedUrl.dropLast("/SKILL.md".length)
-      }
-      if (normalizedUrl.endsWith("/")) {
-        normalizedUrl = normalizedUrl.dropLast(1)
-      }
-
-      return convertGithubTreeOrBlobUrlToRaw(normalizedUrl) ?: normalizedUrl
-    }
-
-    private fun convertGithubTreeOrBlobUrlToRaw(url: String): String? {
-      val uri = runCatching { URI(url) }.getOrNull() ?: return null
-      if (!uri.host.equals("github.com", ignoreCase = true)) {
-        return null
-      }
-
-      val segments = uri.path.trim('/').split('/').filter { it.isNotBlank() }
-      if (segments.size < 4) {
-        return null
-      }
-
-      val owner = segments[0]
-      val repo = segments[1]
-      val marker = segments[2]
-      if (marker != "tree" && marker != "blob") {
-        return null
-      }
-
-      val ref = segments[3]
-      val skillPathSegments =
-        segments.drop(4).let { path ->
-          if (path.lastOrNull().equals("SKILL.md", ignoreCase = true)) path.dropLast(1) else path
-        }
-
-      return buildString {
-        append("https://raw.githubusercontent.com/")
-        append(owner)
-        append('/')
-        append(repo)
-        append('/')
-        append(ref)
-        if (skillPathSegments.isNotEmpty()) {
-          append('/')
-          append(skillPathSegments.joinToString("/"))
-        }
-      }
-    }
-
     /**
      * Converts the content of a skill.md file to a [Skill] proto.
      *
