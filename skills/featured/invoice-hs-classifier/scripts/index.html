@@ -76,15 +76,22 @@
         if (normalized.startsWith("/9j/")) return "image/jpeg";
         if (normalized.startsWith("R0lGOD")) return "image/gif";
         if (normalized.startsWith("Qk0")) return "image/bmp";
-        return "image/png";
+        return "";
       }
 
       function toDataUri(base64, mimeHint) {
-        if (!base64) return "";
-        if (base64.startsWith("data:")) return base64;
+        if (!base64) return { dataUri: "", warning: "" };
+        if (base64.startsWith("data:")) return { dataUri: base64, warning: "" };
         const mimeType = detectMimeTypeFromBase64(base64, mimeHint);
+        if (!mimeType) {
+          return {
+            dataUri: "",
+            warning:
+              "Unable to infer MIME type from base64 payload. Provide invoice_image_mime_type explicitly.",
+          };
+        }
         const normalized = base64.replace(/\s/g, "");
-        return `data:${mimeType};base64,${normalized}`;
+        return { dataUri: `data:${mimeType};base64,${normalized}`, warning: "" };
       }
 
       function extractLineItemsFromText(rawText) {
@@ -199,7 +206,16 @@
           body.set("OCREngine", "2");
 
           if (sourceBase64) {
-            const normalized = toDataUri(sourceBase64, sourceMimeType);
+            const { dataUri, warning } = toDataUri(sourceBase64, sourceMimeType);
+            if (!dataUri) {
+              return {
+                text: payload.ocr_text || "",
+                pages: 0,
+                confidence: null,
+                warnings: [warning || "Unable to parse base64 payload for OCR request."],
+              };
+            }
+            const normalized = dataUri;
             body.set("base64Image", normalized);
           } else {
             body.set("url", sourceUrl);
@@ -277,7 +293,7 @@
       ) {
         const questions = [];
 
-        if (destinationExplicitlyProvided && destinationCountry.toUpperCase() === "US") {
+        if (!destinationExplicitlyProvided && destinationCountry.toUpperCase() === "US") {
           questions.push("Are the goods definitely being imported into the United States?");
         }
 
@@ -336,7 +352,7 @@
             follow_up_questions: followUpQuestions,
             notes: [
               "Rows with extraction_flags need lower classification confidence until clarified.",
-              "If only one page was provided but invoice appears multi page, request remaining pages.",
+              "If only one page was provided but invoice appears multi-page, request remaining pages.",
             ],
           };
 
