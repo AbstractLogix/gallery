@@ -100,7 +100,7 @@
           /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)\s*(?<unit>[A-Za-z]{1,6})?\s{2,}(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s{2,}(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
 
         lines.forEach((line, idx) => {
-          if (/invoice|total|subtotal|tax|amount due/i.test(line) && !/\d/.test(line)) {
+          if (/invoice|total|subtotal|tax|amount due/i.test(line)) {
             return;
           }
 
@@ -269,10 +269,15 @@
         }
       }
 
-      function buildFollowUpQuestions(items, extractionWarnings, destinationCountry) {
+      function buildFollowUpQuestions(
+        items,
+        extractionWarnings,
+        destinationCountry,
+        destinationExplicitlyProvided,
+      ) {
         const questions = [];
 
-        if (destinationCountry.toUpperCase() === "US") {
+        if (destinationExplicitlyProvided && destinationCountry.toUpperCase() === "US") {
           questions.push("Are the goods definitely being imported into the United States?");
         }
 
@@ -302,6 +307,9 @@
       window["ai_edge_gallery_get_result"] = async (data, secret) => {
         try {
           const payload = safeJsonParse(data);
+          const destinationExplicitlyProvided = Boolean(
+            String(payload.destination_country || "").trim(),
+          );
           const destinationCountry = String(payload.destination_country || "US").trim() || "US";
 
           const ocr = await runOcrSpace(payload, secret);
@@ -313,6 +321,7 @@
             extraction.itemRows,
             warnings,
             destinationCountry,
+            destinationExplicitlyProvided,
           );
 
           const resultPayload = {
@@ -331,7 +340,7 @@
             ],
           };
 
-          return JSON.stringify({ result: JSON.stringify(resultPayload) });
+          return JSON.stringify({ result: resultPayload });
         } catch (e) {
           return JSON.stringify({
             error: `Invoice extraction failed: ${e?.message || "unknown error"}`,
