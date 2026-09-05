@@ -57,9 +57,14 @@
 
       function isVagueDescription(text) {
         const lower = (text || "").toLowerCase();
-        return ["parts", "misc", "misc goods", "accessories", "assorted"].some((w) =>
-          lower.includes(w),
-        );
+        const patterns = [
+          /\bparts\b/,
+          /\bmisc\b/,
+          /\bmisc goods\b/,
+          /\baccessories\b/,
+          /\bassorted\b/,
+        ];
+        return patterns.some((pattern) => pattern.test(lower));
       }
 
       function parseMoney(value) {
@@ -114,7 +119,7 @@
         const warnings = [];
 
         const rowRegex =
-          /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)\s*(?<unit>[A-Za-z]{1,6})?\s+(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s{2,}(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
+          /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)\s*(?<unit>[A-Za-z]{1,6})?\s+(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s+(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
 
         lines.forEach((line, idx) => {
           if (/invoice|total|subtotal|tax|amount due/i.test(line)) {
@@ -276,8 +281,10 @@
             warnings.push("OCR confidence is low; extracted rows may be incomplete.");
           }
 
+          const mergedText = textParts.trim() ? textParts : payload.ocr_text || "";
+
           return {
-            text: [payload.ocr_text || "", textParts].filter(Boolean).join("\n"),
+            text: mergedText,
             pages: results.length,
             confidence: avgConfidence,
             warnings,
