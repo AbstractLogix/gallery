@@ -117,8 +117,10 @@
         } else if (hasComma && !hasDot) {
           if (/^\d{1,3}(,\d{3})+$/.test(unsigned)) {
             normalized = unsigned.replace(/,/g, "");
-          } else {
+          } else if (/^\d+,\d{1,4}$/.test(unsigned)) {
             normalized = unsigned.replace(/,/g, ".");
+          } else {
+            return "";
           }
         } else if (hasDot) {
           if (/^\d{1,3}(\.\d{3}){1,}$/.test(unsigned)) {
@@ -176,7 +178,7 @@
         const warnings = [];
 
         const rowRegex =
-          /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)(?:\s+(?<unit>[A-Za-z]{1,6}))?\s+(?<unitPrice>[\$€£]?(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d{1,4})?)\s+(?<lineTotal>[\$€£]?(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d{1,4})?)$/;
+          /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)(?:\s+(?<unit>[A-Za-z]{1,6}))?\s+(?<unitPrice>[\$€£]?[\d.,]+)\s+(?<lineTotal>[\$€£]?[\d.,]+)$/;
 
         lines.forEach((line, idx) => {
           if (/^\s*(subtotal|total|tax|amount due)\b/i.test(line)) {
@@ -385,7 +387,11 @@
           questions.push("Can you confirm quantity, unit price, and line total for incomplete rows?");
         }
 
-        if ((extractionWarnings || []).some((w) => /page|incomplete/i.test(w))) {
+        if (
+          (extractionWarnings || []).some((w) =>
+            /page|incomplete|empty text|no clear line item|low confidence/i.test(w),
+          )
+        ) {
           questions.push("Are these all the invoice pages, or are additional pages coming?");
         }
 
