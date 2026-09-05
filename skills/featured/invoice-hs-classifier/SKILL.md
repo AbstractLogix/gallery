@@ -19,9 +19,10 @@ Use script name `index.html`.
 Pass `data` as a JSON string with this schema:
 - `destination_country`: Optional string. Default `US`.
 - `invoice_image_base64`: Optional string. Base64 image payload.
+- `invoice_image_mime_type`: Optional string. Example `image/png`, `image/jpeg`, or `application/pdf`.
 - `invoice_image_url`: Optional string. Public image URL.
 - `invoice_pdf_url`: Optional string. Public single page PDF URL.
-- `ocr_text`: Optional string. Pre extracted invoice text if available.
+- `ocr_text`: Optional string. Pre-extracted invoice text if available.
 - `hints`: Optional object. Any known context like expected materials, product names, or known country of origin.
 
 The JS tool returns normalized line items and extraction warnings.

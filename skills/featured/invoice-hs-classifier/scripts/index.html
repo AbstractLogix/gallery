@@ -68,6 +68,25 @@
         return cleaned || "";
       }
 
+      function detectMimeTypeFromBase64(base64, mimeHint) {
+        if ((mimeHint || "").trim()) return mimeHint.trim();
+        const normalized = (base64 || "").replace(/\s/g, "");
+        if (normalized.startsWith("JVBERi0")) return "application/pdf";
+        if (normalized.startsWith("iVBORw0KGgo")) return "image/png";
+        if (normalized.startsWith("/9j/")) return "image/jpeg";
+        if (normalized.startsWith("R0lGOD")) return "image/gif";
+        if (normalized.startsWith("Qk0")) return "image/bmp";
+        return "image/png";
+      }
+
+      function toDataUri(base64, mimeHint) {
+        if (!base64) return "";
+        if (base64.startsWith("data:")) return base64;
+        const mimeType = detectMimeTypeFromBase64(base64, mimeHint);
+        const normalized = base64.replace(/\s/g, "");
+        return `data:${mimeType};base64,${normalized}`;
+      }
+
       function extractLineItemsFromText(rawText) {
         const lines = String(rawText || "")
           .split(/\r?\n/)
@@ -78,7 +97,7 @@
         const warnings = [];
 
         const rowRegex =
-          /^(?<description>.+?)\s{1,}(?<quantity>\d+(?:[.,]\d+)?)\s*(?<unit>[A-Za-z]{1,6})?\s{1,}(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s{1,}(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
+          /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)\s*(?<unit>[A-Za-z]{1,6})?\s{2,}(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s{2,}(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
 
         lines.forEach((line, idx) => {
           if (/invoice|total|subtotal|tax|amount due/i.test(line) && !/\d/.test(line)) {
@@ -149,6 +168,7 @@
 
         const sourceUrl = payload.invoice_image_url || payload.invoice_pdf_url || payload.file_url || "";
         const sourceBase64 = payload.invoice_image_base64 || payload.image_base64 || "";
+        const sourceMimeType = payload.invoice_image_mime_type || payload.mime_type || "";
 
         if (!sourceUrl && !sourceBase64 && !payload.ocr_text) {
           return {
@@ -179,9 +199,7 @@
           body.set("OCREngine", "2");
 
           if (sourceBase64) {
-            const normalized = sourceBase64.startsWith("data:")
-              ? sourceBase64
-              : `data:image/png;base64,${sourceBase64}`;
+            const normalized = toDataUri(sourceBase64, sourceMimeType);
             body.set("base64Image", normalized);
           } else {
             body.set("url", sourceUrl);
