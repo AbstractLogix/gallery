@@ -992,9 +992,6 @@ constructor(
         segments.drop(4).let { path ->
           if (path.lastOrNull().equals("SKILL.md", ignoreCase = true)) path.dropLast(1) else path
         }
-      if (skillPathSegments.isEmpty()) {
-        return null
-      }
 
       return buildString {
         append("https://raw.githubusercontent.com/")
@@ -1003,8 +1000,10 @@ constructor(
         append(repo)
         append('/')
         append(ref)
-        append('/')
-        append(skillPathSegments.joinToString("/"))
+        if (skillPathSegments.isNotEmpty()) {
+          append('/')
+          append(skillPathSegments.joinToString("/"))
+        }
       }
     }
 
