@@ -70,7 +70,10 @@
       function parseMoney(value) {
         if (!value) return "";
         const cleaned = String(value).replace(/[^0-9.,-]/g, "");
-        return cleaned || "";
+        if (!cleaned) return "";
+        const normalized = cleaned.replace(/,/g, "");
+        if (!/^-?\d+(?:\.\d+)?$/.test(normalized)) return "";
+        return cleaned;
       }
 
       function isLikelyUnstructuredItemLine(line) {
@@ -330,7 +333,7 @@
         }
 
         if ((extractionWarnings || []).some((w) => /page|incomplete/i.test(w))) {
-          questions.push("Is this all invoice pages, or are additional pages coming?");
+          questions.push("Are these all the invoice pages, or are additional pages coming?");
         }
 
         return [...new Set(questions)];
