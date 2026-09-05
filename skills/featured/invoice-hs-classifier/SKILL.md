@@ -163,8 +163,6 @@ Apply the HS General Rules of Interpretation (GRI), in order:
 | 97 | Works of art, collectors' pieces, antiques |
 | 98–99 | Reserved for each country's domestic/special-use provisions (not part of the international HS) |
 
-(Chapter 77 is reserved and unused.)
-
 ## Step 3a — Default to US HTSUS (10-digit)
 
 Unless the invoice or the user names a different destination country, assume
