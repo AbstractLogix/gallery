@@ -976,7 +976,7 @@ constructor(
       }
 
       val segments = uri.path.trim('/').split('/').filter { it.isNotBlank() }
-      if (segments.size < 5) {
+      if (segments.size < 4) {
         return null
       }
 
