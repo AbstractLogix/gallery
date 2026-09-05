@@ -147,7 +147,7 @@
         const cleaned = String(value || "").replace(/[^0-9.]/g, "");
         const collapsed = cleaned.replace(/\.{2,}/g, ".").replace(/^\.+|\.+$/g, "");
         if (!collapsed) return "";
-        return /^\d{4,10}(?:\.\d{1,4}){0,2}$/.test(collapsed) ? collapsed : "";
+        return /^\d{6,10}(?:\.\d{1,4}){0,2}$/.test(collapsed) ? collapsed : "";
       }
 
       function isLikelyUnstructuredItemLine(line) {
@@ -207,7 +207,7 @@
           if (rowMatch?.groups) {
             const description = rowMatch.groups.description.trim();
             const item = {
-              index: itemRows.length + 1,
+              index: 1,
               source_line: idx + 1,
               raw_line: line,
               description,
@@ -423,7 +423,7 @@
             warnings.push("OCR completed but returned empty text.");
           }
           if (
-            /(?:page|sheet)\s*\d+\s*(?:of|\/)\s*(?:[2-9]\d*|\d{2,})|(?:^|\n)\s*[1-9]\d?\s*\/\s*(?:[2-9]\d*|\d{2,})\s*(?:$|\n)/i.test(
+            /(?:page|sheet)\s*\d+\s*(?:of|\/)\s*(?:[2-9]\d*|\d{2,})|^\s*[1-9]\d?\s*\/\s*(?:[2-9]\d*|\d{2,})\s*$/im.test(
               textParts,
             )
           ) {
