@@ -12,9 +12,12 @@ Use JavaScript extraction first, then classify.
 
 ## Instructions
 
-Call the `run_js` tool.
+Call the `run_js` tool with these exact parameters:
+- script name: `index.html`
+- data: JSON string following the schema below
 
-Use script name `index.html`.
+The script name must always be exactly `index.html`.
+Never derive script name from user text, destination country, invoice content, or any other prompt token.
 
 Pass `data` as a JSON string with this schema:
 - `destination_country`: Optional string. Default `US`.
@@ -24,6 +27,8 @@ Pass `data` as a JSON string with this schema:
 - `invoice_pdf_url`: Optional string. Public single page PDF URL.
 - `ocr_text`: Optional string. Pre-extracted invoice text if available.
 - `hints`: Optional object. Any known context like expected materials, product names, or known country of origin.
+
+If only free-text OCR content is available, call `run_js` with `ocr_text` only and keep script name as `index.html`.
 
 The JS tool returns normalized line items and extraction warnings.
 
