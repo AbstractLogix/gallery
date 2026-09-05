@@ -238,6 +238,8 @@
               unit: "",
               unit_price: "",
               line_total: "",
+              unit_price_raw: "",
+              line_total_raw: "",
               material: detectMaterial(line),
               country_of_origin: detectOrigin(line),
               extraction_flags: ["unstructured_row"],
@@ -416,7 +418,7 @@
           if (!textParts.trim()) {
             warnings.push("OCR completed but returned empty text.");
           }
-          if (/page\s*1\s*(of|\/)\s*(?:[2-9]\d*|\d{2,})/i.test(textParts)) {
+          if (/page\s*\d+\s*(of|\/)\s*(?:[2-9]\d*|\d{2,})/i.test(textParts)) {
             warnings.push("possible_multi_page_invoice");
           }
           if (avgConfidence !== null && avgConfidence < LOW_CONFIDENCE_THRESHOLD) {
