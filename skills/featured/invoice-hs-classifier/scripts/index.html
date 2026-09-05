@@ -68,6 +68,16 @@
         return cleaned || "";
       }
 
+      function isLikelyUnstructuredItemLine(line) {
+        const numberTokens = (line.match(/\b\d+(?:[.,]\d+)?\b/g) || []).length;
+        const hasCurrency = /[$€£]/.test(line);
+        const hasQtyUnit =
+          /\b\d+(?:[.,]\d+)?\s*(pc|pcs|kg|g|lb|m|cm|mm|set|sets|box|boxes|pair|pairs)\b/i.test(
+            line,
+          );
+        return (hasCurrency && numberTokens >= 2) || (hasQtyUnit && numberTokens >= 2);
+      }
+
       function detectMimeTypeFromBase64(base64, mimeHint) {
         if ((mimeHint || "").trim()) return mimeHint.trim();
         const normalized = (base64 || "").replace(/\s/g, "");
@@ -134,7 +144,7 @@
             return;
           }
 
-          if (/\d/.test(line) && line.length > 6) {
+          if (line.length > 6 && isLikelyUnstructuredItemLine(line)) {
             const item = {
               index: itemRows.length + 1,
               source_line: idx + 1,
@@ -215,8 +225,7 @@
                 warnings: [warning || "Unable to parse base64 payload for OCR request."],
               };
             }
-            const normalized = dataUri;
-            body.set("base64Image", normalized);
+            body.set("base64Image", dataUri);
           } else {
             body.set("url", sourceUrl);
           }
@@ -293,7 +302,7 @@
       ) {
         const questions = [];
 
-        if (!destinationExplicitlyProvided && destinationCountry.toUpperCase() === "US") {
+        if (!destinationExplicitlyProvided) {
           questions.push("Are the goods definitely being imported into the United States?");
         }
 
