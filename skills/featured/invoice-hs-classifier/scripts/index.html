@@ -147,7 +147,7 @@
         const cleaned = String(value || "").replace(/[^0-9.]/g, "");
         const collapsed = cleaned.replace(/\.{2,}/g, ".").replace(/^\.+|\.+$/g, "");
         if (!collapsed) return "";
-        return /^\d{4,10}(?:\.\d+)*$/.test(collapsed) ? collapsed : "";
+        return /^\d{4,10}(?:\.\d{1,4}){0,2}$/.test(collapsed) ? collapsed : "";
       }
 
       function isLikelyUnstructuredItemLine(line) {
@@ -213,8 +213,10 @@
               description,
               quantity: parseQuantity(rowMatch.groups.quantity || ""),
               unit: rowMatch.groups.unit || "",
-              unit_price: parseMoney(rowMatch.groups.unitPrice) || rowMatch.groups.unitPrice || "",
-              line_total: parseMoney(rowMatch.groups.lineTotal) || rowMatch.groups.lineTotal || "",
+              unit_price: parseMoney(rowMatch.groups.unitPrice) || "",
+              line_total: parseMoney(rowMatch.groups.lineTotal) || "",
+              unit_price_raw: rowMatch.groups.unitPrice || "",
+              line_total_raw: rowMatch.groups.lineTotal || "",
               material: detectMaterial(description),
               country_of_origin: detectOrigin(line),
               extraction_flags: [],
@@ -288,7 +290,7 @@
               quantity: parseQuantity(quantityRaw),
               unit: unitRaw || "",
               unit_price: "",
-              line_total: parseMoney(valueRaw) || valueRaw,
+              line_total: parseMoney(valueRaw) || "",
               declared_value_raw: valueRaw,
               material: detectMaterial(description),
               country_of_origin: countryRaw || "",
@@ -414,7 +416,7 @@
           if (!textParts.trim()) {
             warnings.push("OCR completed but returned empty text.");
           }
-          if (/page\s*1\s*(of|\/)\s*[2-9]\d*/i.test(textParts)) {
+          if (/page\s*1\s*(of|\/)\s*(?:[2-9]\d*|\d{2,})/i.test(textParts)) {
             warnings.push("possible_multi_page_invoice");
           }
           if (avgConfidence !== null && avgConfidence < LOW_CONFIDENCE_THRESHOLD) {
