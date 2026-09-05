@@ -136,6 +136,7 @@ Apply the HS General Rules of Interpretation (GRI), in order:
 | 74 | Copper and articles thereof |
 | 75 | Nickel and articles thereof |
 | 76 | Aluminium and articles thereof |
+| 77 | Reserved (unused) |
 | 78 | Lead and articles thereof |
 | 79 | Zinc and articles thereof |
 | 80 | Tin and articles thereof |
