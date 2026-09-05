@@ -44,122 +44,31 @@ Apply the HS General Rules of Interpretation (GRI), in order:
 
 ## Step 3 — Chapter quick-reference (HS 2022, Chapters 1–97)
 
-| Ch | Section covers |
-| 01–05 | Live animals & animal products |
-| 01 | Live animals |
-| 02 | Meat and edible meat offal |
-| 03 | Fish, crustaceans, molluscs |
-| 04 | Dairy, eggs, honey, edible animal products n.e.s. |
-| 05 | Animal products n.e.s. |
-| 06–14 | Vegetable products |
-| 06 | Live trees/plants, cut flowers |
-| 07 | Edible vegetables, roots, tubers |
-| 08 | Edible fruit and nuts, citrus/melon peel |
-| 09 | Coffee, tea, maté, spices |
-| 10 | Cereals |
-| 11 | Milling products, malt, starches, gluten |
-| 12 | Oil seeds, industrial/medicinal plants, straw, fodder |
-| 13 | Lac, gums, resins, vegetable saps/extracts |
-| 14 | Vegetable plaiting materials n.e.s. |
-| 15 | Animal/vegetable fats, oils, waxes |
-| 16–24 | Foodstuffs, beverages, tobacco |
-| 16 | Meat/fish/crustacean preparations |
-| 17 | Sugars and sugar confectionery |
-| 18 | Cocoa and cocoa preparations |
-| 19 | Cereal/flour/starch/milk preparations, pastry |
-| 20 | Vegetable, fruit, nut preparations |
-| 21 | Miscellaneous edible preparations |
-| 22 | Beverages, spirits, vinegar |
-| 23 | Food-industry residues, animal fodder |
-| 24 | Tobacco, tobacco substitutes, nicotine products |
-| 25–27 | Mineral products |
-| 25 | Salt, sulphur, earths, stone, cement, lime |
-| 26 | Ores, slag, ash |
-| 27 | Mineral fuels/oils, bituminous substances, waxes |
-| 28–38 | Chemicals |
-| 28 | Inorganic chemicals, precious/rare-earth compounds |
-| 29 | Organic chemicals |
-| 30 | Pharmaceutical products |
-| 31 | Fertilisers |
-| 32 | Dyes, pigments, paints, varnishes, inks |
-| 33 | Essential oils, perfumery, cosmetics, toiletries |
-| 34 | Soap, waxes, polishes, candles |
-| 35 | Albuminoidal substances, glues, enzymes |
-| 36 | Explosives, pyrotechnics, matches |
-| 37 | Photographic/cinematographic goods |
-| 38 | Miscellaneous chemical products |
-| 39–40 | Plastics and rubber |
-| 39 | Plastics and articles thereof |
-| 40 | Rubber and articles thereof |
-| 41–43 | Hides, leather, furskins |
-| 41 | Raw hides and skins, leather |
-| 42 | Leather articles, bags, luggage, saddlery |
-| 43 | Furskins, artificial fur |
-| 44–46 | Wood and wood products |
-| 44 | Wood and articles of wood, charcoal |
-| 45 | Cork and articles of cork |
-| 46 | Straw/esparto manufactures, basketware |
-| 47–49 | Pulp, paper, printed matter |
-| 47 | Wood pulp, recovered paper/paperboard |
-| 48 | Paper and paperboard, articles thereof |
-| 49 | Printed books, newspapers, pictures |
-| 50–63 | Textiles and textile articles |
-| 50 | Silk |
-| 51 | Wool, animal hair, horsehair fabric |
-| 52 | Cotton |
-| 53 | Other vegetable textile fibres |
-| 54 | Man-made filaments |
-| 55 | Man-made staple fibres |
-| 56 | Wadding, felt, nonwovens, twine, rope |
-| 57 | Carpets and textile floor coverings |
-| 58 | Special woven fabrics, lace, tapestry, embroidery |
-| 59 | Impregnated/coated textile fabrics, industrial textiles |
-| 60 | Knitted or crocheted fabrics |
-| 61 | Apparel, knitted or crocheted |
-| 62 | Apparel, not knitted or crocheted |
-| 63 | Other made-up textiles, worn clothing, rags |
-| 64–67 | Footwear, headgear, misc. |
-| 64 | Footwear, gaiters, parts |
-| 65 | Headgear and parts |
-| 66 | Umbrellas, walking-sticks, whips |
-| 67 | Feathers, artificial flowers, human-hair articles |
-| 68–70 | Stone, ceramic, glass |
-| 68 | Articles of stone, plaster, cement, mica |
-| 69 | Ceramic products |
-| 70 | Glass and glassware |
-| 71 | Pearls, precious stones/metals, jewellery, coin |
-| 72–83 | Base metals and articles |
-| 72 | Iron and steel |
-| 73 | Articles of iron or steel |
-| 74 | Copper and articles thereof |
-| 75 | Nickel and articles thereof |
-| 76 | Aluminium and articles thereof |
-| 77 | Reserved (unused) |
-| 78 | Lead and articles thereof |
-| 79 | Zinc and articles thereof |
-| 80 | Tin and articles thereof |
-| 81 | Other base metals, cermets |
-| 82 | Tools, cutlery, spoons/forks of base metal |
-| 83 | Miscellaneous articles of base metal |
-| 84–85 | Machinery and electrical equipment |
-| 84 | Machinery, mechanical appliances, boilers, reactors |
-| 85 | Electrical machinery, electronics, AV equipment |
-| 86–89 | Transport equipment |
-| 86 | Railway/tramway rolling stock and fixtures |
-| 87 | Vehicles (non-rail) and parts/accessories |
-| 88 | Aircraft, spacecraft, and parts |
-| 89 | Ships, boats, floating structures |
-| 90–92 | Precision instruments, clocks, musical instruments |
-| 90 | Optical, medical, measuring, precision instruments |
-| 91 | Clocks and watches |
-| 92 | Musical instruments |
-| 93 | Arms and ammunition |
-| 94–96 | Miscellaneous manufactures |
-| 94 | Furniture, bedding, lighting, prefab buildings |
-| 95 | Toys, games, sports requisites |
-| 96 | Miscellaneous manufactured articles |
-| 97 | Works of art, collectors' pieces, antiques |
-| 98–99 | Reserved for each country's domestic/special-use provisions (not part of the international HS) |
+Use this chapter map to narrow by chapter first, then heading and subheading:
+
+- Ch 01 to 05: Live animals and animal products
+- Ch 06 to 14: Vegetable products
+- Ch 15: Animal or vegetable fats, oils, and waxes
+- Ch 16 to 24: Foodstuffs, beverages, and tobacco
+- Ch 25 to 27: Mineral products
+- Ch 28 to 38: Chemicals and related products
+- Ch 39 to 40: Plastics, rubber, and articles thereof
+- Ch 41 to 43: Hides, leather, and furskins
+- Ch 44 to 46: Wood, cork, and basketware materials
+- Ch 47 to 49: Pulp, paper, and printed matter
+- Ch 50 to 63: Textiles and textile articles
+- Ch 64 to 67: Footwear, headgear, umbrellas, and similar
+- Ch 68 to 70: Stone, ceramic, and glass products
+- Ch 71: Precious stones, precious metals, jewellery, coin
+- Ch 72 to 83: Base metals and articles
+- Ch 77: Reserved (unused)
+- Ch 84 to 85: Machinery and electrical equipment
+- Ch 86 to 89: Transport equipment
+- Ch 90 to 92: Precision, medical, optical, clocks, musical instruments
+- Ch 93: Arms and ammunition
+- Ch 94 to 96: Miscellaneous manufactured articles
+- Ch 97: Works of art, collectors' pieces, antiques
+- Ch 98 to 99: Domestic special-use provisions (not part of international HS)
 
 ## Step 3a — Default to US HTSUS (10-digit)
 
@@ -190,7 +99,16 @@ HTSUS classification, not just the HS-6:
 
 Present a table with one row per line item:
 
-| # | Invoice description | HS-6 | HTSUS-8 (rate line) | HTSUS-10 (statistical) | Chapter/heading title | Confidence | Why | Extra-duty flag |
+Required columns, in this order:
+- #
+- Invoice description
+- HS-6
+- HTSUS-8 (rate line)
+- HTSUS-10 (statistical)
+- Chapter/heading title
+- Confidence
+- Why
+- Extra-duty flag
 
 - **Confidence**: High / Medium / Low, given per digit-level if it drops off
   (e.g. "High to 6, Medium to 8, Low on the statistical suffix"). Use Low
