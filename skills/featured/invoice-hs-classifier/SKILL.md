@@ -1,7 +1,6 @@
 ---
 name: invoice-hs-classifier
 description: Reads a commercial invoice, packing list, or proforma invoice (photo or PDF page) attached to the chat, extracts each line item, and suggests the most likely Harmonized Tariff Schedule of the United States (HTSUS) code for it, built on top of the WCO Harmonized System (HS) and its General Rules of Interpretation. Defaults to US import classification. Trigger this skill whenever the user shares an image or PDF of an invoice/packing list and asks for HS codes, HTS codes, tariff codes, Schedule B numbers, customs classification, or "harmonized codes" for the items on it.
-license: MIT
 ---
 
 # Invoice HS Code Classifier
@@ -46,7 +45,6 @@ Apply the HS General Rules of Interpretation (GRI), in order:
 ## Step 3 — Chapter quick-reference (HS 2022, Chapters 1–97)
 
 | Ch | Section covers |
-|----|-----------------|
 | 01–05 | Live animals & animal products |
 | 01 | Live animals |
 | 02 | Meat and edible meat offal |
@@ -193,7 +191,6 @@ HTSUS classification, not just the HS-6:
 Present a table with one row per line item:
 
 | # | Invoice description | HS-6 | HTSUS-8 (rate line) | HTSUS-10 (statistical) | Chapter/heading title | Confidence | Why | Extra-duty flag |
-|---|---|---|---|---|---|---|---|---|
 
 - **Confidence**: High / Medium / Low, given per digit-level if it drops off
   (e.g. "High to 6, Medium to 8, Low on the statistical suffix"). Use Low
