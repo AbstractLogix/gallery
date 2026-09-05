@@ -98,10 +98,12 @@
 
       function parseMoney(value) {
         if (!value) return "";
-        const cleaned = String(value).replace(/[^0-9.,-]/g, "").trim();
+        const raw = String(value);
+        const parentheticalNegative = /^\s*\(.*\)\s*$/.test(raw);
+        const cleaned = raw.replace(/[^0-9.,-]/g, "");
         if (!cleaned) return "";
-        const sign = cleaned.startsWith("-") ? "-" : "";
-        const unsigned = sign ? cleaned.slice(1) : cleaned;
+        const sign = cleaned.startsWith("-") || parentheticalNegative ? "-" : "";
+        const unsigned = cleaned.startsWith("-") ? cleaned.slice(1) : cleaned;
         if (unsigned.includes("-")) return "";
         if (!unsigned) return "";
 
@@ -337,6 +339,9 @@
           if (!textParts.trim()) {
             warnings.push("OCR completed but returned empty text.");
           }
+          if (/page\s*1\s*(of|\/)\s*[2-9]\d*/i.test(textParts)) {
+            warnings.push("possible_multi_page_invoice");
+          }
           if (avgConfidence !== null && avgConfidence < LOW_CONFIDENCE_THRESHOLD) {
             warnings.push("OCR confidence is low; extracted rows may be incomplete.");
           }
@@ -390,7 +395,7 @@
 
         if (
           (extractionWarnings || []).some((w) =>
-            /multi.?page|empty text|no clear line item/i.test(w),
+            /possible_multi_page_invoice|multi.?page|empty text|no clear line item/i.test(w),
           )
         ) {
           questions.push("Are these all the invoice pages, or are additional pages coming?");
