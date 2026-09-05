@@ -50,7 +50,7 @@
 
       function detectOrigin(text) {
         const match = (text || "").match(
-          /(country of origin|made in|origin)\s*[:\-]?\s*([A-Za-z][A-Za-z .]{1,40})/i,
+          /(country of origin|made in|origin)\s*[-:]?\s*([A-Za-z][A-Za-z .]{1,40})/i,
         );
         return match?.[2]?.trim() || "";
       }
@@ -114,7 +114,7 @@
         const warnings = [];
 
         const rowRegex =
-          /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)\s*(?<unit>[A-Za-z]{1,6})?\s{2,}(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s{2,}(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
+          /^(?<description>.+?)\s{2,}(?<quantity>\d+(?:[.,]\d+)?)\s*(?<unit>[A-Za-z]{1,6})?\s+(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s{2,}(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
 
         lines.forEach((line, idx) => {
           if (/invoice|total|subtotal|tax|amount due/i.test(line)) {
@@ -335,7 +335,7 @@
           const destinationExplicitlyProvided = Boolean(
             String(payload.destination_country || "").trim(),
           );
-          const destinationCountry = String(payload.destination_country || "US").trim() || "US";
+          const destinationCountry = String(payload.destination_country || "US").trim();
 
           const ocr = await runOcrSpace(payload, secret);
           const extraction = extractLineItemsFromText(ocr.text);
