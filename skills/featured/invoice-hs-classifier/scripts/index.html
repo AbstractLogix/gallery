@@ -118,7 +118,7 @@
           if (/^\d{1,3}(,\d{3})+$/.test(unsigned)) {
             normalized = unsigned.replace(/,/g, "");
           } else {
-            normalized = unsigned.replace(",", ".");
+            normalized = unsigned.replace(/,/g, ".");
           }
         } else if (hasDot) {
           if (/^\d{1,3}(\.\d{3}){1,}$/.test(unsigned)) {
@@ -361,7 +361,6 @@
       function buildFollowUpQuestions(
         items,
         extractionWarnings,
-        destinationCountry,
         destinationExplicitlyProvided,
       ) {
         const questions = [];
@@ -415,7 +414,6 @@
           const followUpQuestions = buildFollowUpQuestions(
             extraction.itemRows,
             warnings,
-            destinationCountry,
             destinationExplicitlyProvided,
           );
 
