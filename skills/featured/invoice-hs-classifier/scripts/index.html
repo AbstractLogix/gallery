@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice OCR Extractor</title>
+  </head>
+  <body>
+    <script>
+      function safeJsonParse(value) {
+        if (typeof value === "object" && value !== null) return value;
+        if (typeof value !== "string") return {};
+        try {
+          return JSON.parse(value);
+        } catch {
+          return {};
+        }
+      }
+
+      function cleanTextLine(line) {
+        return (line || "")
+          .replace(/\t/g, " ")
+          .replace(/\s+/g, " ")
+          .replace(/[|]+/g, " ")
+          .trim();
+      }
+
+      function detectMaterial(text) {
+        const lower = (text || "").toLowerCase();
+        const materials = [
+          "cotton",
+          "polyester",
+          "wool",
+          "silk",
+          "nylon",
+          "plastic",
+          "rubber",
+          "stainless steel",
+          "steel",
+          "aluminum",
+          "aluminium",
+          "copper",
+          "wood",
+          "leather",
+          "ceramic",
+          "glass",
+        ];
+        return materials.find((m) => lower.includes(m)) || "";
+      }
+
+      function detectOrigin(text) {
+        const match = (text || "").match(
+          /(country of origin|made in|origin)\s*[:\-]?\s*([A-Za-z][A-Za-z .]{1,40})/i,
+        );
+        return match?.[2]?.trim() || "";
+      }
+
+      function isVagueDescription(text) {
+        const lower = (text || "").toLowerCase();
+        return ["parts", "misc", "misc goods", "accessories", "assorted"].some((w) =>
+          lower.includes(w),
+        );
+      }
+
+      function parseMoney(value) {
+        if (!value) return "";
+        const cleaned = String(value).replace(/[^0-9.,-]/g, "");
+        return cleaned || "";
+      }
+
+      function extractLineItemsFromText(rawText) {
+        const lines = String(rawText || "")
+          .split(/\r?\n/)
+          .map(cleanTextLine)
+          .filter(Boolean);
+
+        const itemRows = [];
+        const warnings = [];
+
+        const rowRegex =
+          /^(?<description>.+?)\s{1,}(?<quantity>\d+(?:[.,]\d+)?)\s*(?<unit>[A-Za-z]{1,6})?\s{1,}(?<unitPrice>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)\s{1,}(?<lineTotal>[\$€£]?\d[\d,]*(?:\.\d{1,4})?)$/;
+
+        lines.forEach((line, idx) => {
+          if (/invoice|total|subtotal|tax|amount due/i.test(line) && !/\d/.test(line)) {
+            return;
+          }
+
+          const rowMatch = line.match(rowRegex);
+          if (rowMatch?.groups) {
+            const description = rowMatch.groups.description.trim();
+            const item = {
+              index: itemRows.length + 1,
+              source_line: idx + 1,
+              raw_line: line,
+              description,
+              quantity: rowMatch.groups.quantity || "",
+              unit: rowMatch.groups.unit || "",
+              unit_price: parseMoney(rowMatch.groups.unitPrice),
+              line_total: parseMoney(rowMatch.groups.lineTotal),
+              material: detectMaterial(description),
+              country_of_origin: detectOrigin(line),
+              extraction_flags: [],
+            };
+            if (isVagueDescription(description)) {
+              item.extraction_flags.push("vague_description");
+            }
+            itemRows.push(item);
+            return;
+          }
+
+          if (/\d/.test(line) && line.length > 6) {
+            const item = {
+              index: itemRows.length + 1,
+              source_line: idx + 1,
+              raw_line: line,
+              description: line,
+              quantity: "",
+              unit: "",
+              unit_price: "",
+              line_total: "",
+              material: detectMaterial(line),
+              country_of_origin: detectOrigin(line),
+              extraction_flags: ["unstructured_row"],
+            };
+            if (isVagueDescription(line)) {
+              item.extraction_flags.push("vague_description");
+            }
+            itemRows.push(item);
+          }
+        });
+
+        if (!itemRows.length) {
+          warnings.push("No clear line item rows detected from OCR text.");
+        }
+
+        return { itemRows, warnings };
+      }
+
+      async function runOcrSpace(payload, secret) {
+        const apiKey = (secret || "").trim();
+        if (!apiKey) {
+          return {
+            text: payload.ocr_text || "",
+            pages: 0,
+            confidence: null,
+            warnings: ["No OCR API key provided; used supplied ocr_text only."],
+          };
+        }
+
+        const sourceUrl = payload.invoice_image_url || payload.invoice_pdf_url || payload.file_url || "";
+        const sourceBase64 = payload.invoice_image_base64 || payload.image_base64 || "";
+
+        if (!sourceUrl && !sourceBase64 && !payload.ocr_text) {
+          return {
+            text: "",
+            pages: 0,
+            confidence: null,
+            warnings: [
+              "No OCR source found. Provide invoice_image_base64, invoice_image_url, invoice_pdf_url, or ocr_text.",
+            ],
+          };
+        }
+
+        if (!sourceUrl && !sourceBase64) {
+          return {
+            text: payload.ocr_text || "",
+            pages: 0,
+            confidence: null,
+            warnings: ["Used supplied ocr_text because no file source was provided."],
+          };
+        }
+
+        try {
+          const body = new URLSearchParams();
+          body.set("apikey", apiKey);
+          body.set("language", "eng");
+          body.set("isTable", "true");
+          body.set("scale", "true");
+          body.set("OCREngine", "2");
+
+          if (sourceBase64) {
+            const normalized = sourceBase64.startsWith("data:")
+              ? sourceBase64
+              : `data:image/png;base64,${sourceBase64}`;
+            body.set("base64Image", normalized);
+          } else {
+            body.set("url", sourceUrl);
+          }
+
+          const response = await fetch("https://api.ocr.space/parse/image", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            },
+            body,
+          });
+
+          if (!response.ok) {
+            throw new Error(`OCR request failed with HTTP ${response.status}`);
+          }
+
+          const json = await response.json();
+          const results = Array.isArray(json?.ParsedResults) ? json.ParsedResults : [];
+          const textParts = results
+            .map((r) => r?.ParsedText || "")
+            .filter(Boolean)
+            .join("\n");
+
+          const confidenceSamples = [];
+          results.forEach((r) => {
+            const lines = r?.TextOverlay?.Lines || [];
+            lines.forEach((line) => {
+              const words = line?.Words || [];
+              words.forEach((w) => {
+                if (typeof w?.Confidence === "number") confidenceSamples.push(w.Confidence);
+              });
+            });
+          });
+
+          const avgConfidence = confidenceSamples.length
+            ? Number(
+                (
+                  confidenceSamples.reduce((sum, c) => sum + c, 0) / confidenceSamples.length
+                ).toFixed(2),
+              )
+            : null;
+
+          const warnings = [];
+          if (!textParts.trim()) {
+            warnings.push("OCR completed but returned empty text.");
+          }
+          if (avgConfidence !== null && avgConfidence < 60) {
+            warnings.push("OCR confidence is low; extracted rows may be incomplete.");
+          }
+
+          return {
+            text: [payload.ocr_text || "", textParts].filter(Boolean).join("\n"),
+            pages: results.length,
+            confidence: avgConfidence,
+            warnings,
+          };
+        } catch (err) {
+          return {
+            text: payload.ocr_text || "",
+            pages: 0,
+            confidence: null,
+            warnings: [
+              `OCR API call failed: ${err?.message || "unknown error"}. Falling back to supplied ocr_text if present.`,
+            ],
+          };
+        }
+      }
+
+      function buildFollowUpQuestions(items, extractionWarnings, destinationCountry) {
+        const questions = [];
+
+        if (destinationCountry.toUpperCase() === "US") {
+          questions.push("Are the goods definitely being imported into the United States?");
+        }
+
+        if (items.some((it) => it.extraction_flags.includes("vague_description"))) {
+          questions.push("Can you provide a more specific product description for rows marked vague?");
+        }
+
+        if (items.some((it) => !it.material)) {
+          questions.push("What is the material or composition for items missing material detail?");
+        }
+
+        if (items.some((it) => !it.country_of_origin)) {
+          questions.push("What is the country of origin for each item?");
+        }
+
+        if (items.some((it) => !it.quantity || !it.unit_price || !it.line_total)) {
+          questions.push("Can you confirm quantity, unit price, and line total for incomplete rows?");
+        }
+
+        if ((extractionWarnings || []).some((w) => /page|incomplete/i.test(w))) {
+          questions.push("Is this all invoice pages, or are additional pages coming?");
+        }
+
+        return [...new Set(questions)];
+      }
+
+      window["ai_edge_gallery_get_result"] = async (data, secret) => {
+        try {
+          const payload = safeJsonParse(data);
+          const destinationCountry = String(payload.destination_country || "US").trim() || "US";
+
+          const ocr = await runOcrSpace(payload, secret);
+          const extraction = extractLineItemsFromText(ocr.text);
+
+          const warnings = [...(ocr.warnings || []), ...(extraction.warnings || [])];
+
+          const followUpQuestions = buildFollowUpQuestions(
+            extraction.itemRows,
+            warnings,
+            destinationCountry,
+          );
+
+          const resultPayload = {
+            source: {
+              used_ocr_api: Boolean((secret || "").trim()),
+              destination_country: destinationCountry,
+              pages_detected: ocr.pages,
+              ocr_confidence: ocr.confidence,
+            },
+            extraction_warnings: warnings,
+            line_items: extraction.itemRows,
+            follow_up_questions: followUpQuestions,
+            notes: [
+              "Rows with extraction_flags need lower classification confidence until clarified.",
+              "If only one page was provided but invoice appears multi page, request remaining pages.",
+            ],
+          };
+
+          return JSON.stringify({ result: JSON.stringify(resultPayload) });
+        } catch (e) {
+          return JSON.stringify({
+            error: `Invoice extraction failed: ${e?.message || "unknown error"}`,
+          });
+        }
+      };
+    </script>
+  </body>
+</html>
