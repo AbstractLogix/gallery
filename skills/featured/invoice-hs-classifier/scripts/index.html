@@ -233,6 +233,66 @@
         });
 
         if (!itemRows.length) {
+          const findFieldValue = (fieldNames) => {
+            for (const fieldName of fieldNames) {
+              const pattern = new RegExp(`^${fieldName}\\s*:\\s*(.+)$`, "i");
+              for (const line of lines) {
+                const match = line.match(pattern);
+                if (match?.[1]?.trim()) return match[1].trim();
+              }
+            }
+            return "";
+          };
+
+          const description = findFieldValue([
+            "description of goods",
+            "goods description",
+            "item description",
+            "description",
+          ]);
+          const quantityRaw = findFieldValue(["units", "quantity", "qty"]);
+          const unitRaw = findFieldValue(["measure", "unit of measure", "uom"]);
+          const valueRaw = findFieldValue(["value", "line total", "total value", "amount"]);
+          const harmonizedRaw = findFieldValue([
+            "harmonized tariff number",
+            "harmonized number",
+            "harmonized code",
+            "hs code",
+            "htsus",
+            "tariff number",
+          ]);
+          const countryRaw = findFieldValue(["country of origin", "origin country", "country"]);
+
+          if (description) {
+            const normalizedHarmonized = harmonizedRaw.replace(/[^0-9A-Za-z.]/g, "");
+            const item = {
+              index: 1,
+              source_line: 0,
+              raw_line: "",
+              description,
+              quantity: parseMoney(quantityRaw) || quantityRaw,
+              unit: unitRaw || "",
+              unit_price: "",
+              line_total: parseMoney(valueRaw),
+              declared_value_raw: valueRaw,
+              material: detectMaterial(description),
+              country_of_origin: countryRaw || "",
+              extraction_flags: ["from_key_value_fields"],
+            };
+
+            if (normalizedHarmonized) {
+              item.invoice_harmonized_number = normalizedHarmonized;
+              item.extraction_flags.push("invoice_provided_harmonized_number");
+            }
+            if (isVagueDescription(description)) {
+              item.extraction_flags.push("vague_description");
+            }
+            itemRows.push(item);
+            warnings.push("Recovered line item using key-value invoice fields.");
+          }
+        }
+
+        if (!itemRows.length) {
           warnings.push("No clear line item rows detected from OCR text.");
         }
 
