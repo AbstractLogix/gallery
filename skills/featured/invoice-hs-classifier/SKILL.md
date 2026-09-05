@@ -151,7 +151,7 @@ Apply the HS General Rules of Interpretation (GRI), in order:
 | 87 | Vehicles (non-rail) and parts/accessories |
 | 88 | Aircraft, spacecraft, and parts |
 | 89 | Ships, boats, floating structures |
-| 90–92 | Precision instruments, clocks, instruments |
+| 90–92 | Precision instruments, clocks, musical instruments |
 | 90 | Optical, medical, measuring, precision instruments |
 | 91 | Clocks and watches |
 | 92 | Musical instruments |
